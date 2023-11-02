@@ -1,0 +1,91 @@
+package org.example.rules
+
+import org.example.drools.entity.Mother
+import org.example.drools.entity.DetectedDisease
+
+// Detection of Blood Pressure
+rule "Mild Blood Pressure"
+salience 1
+    when
+        $mother : Mother( bloodPressure.systolic >= 140, bloodPressure.diastolic >= 90)
+        not DetectedDisease( diseaseName == "Blood Pressure" , mother == $mother)
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Blood Pressure" , "Mild", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getSeverity() + " " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+rule "Moderate Blood Pressure"
+salience 5
+    when
+        $mother : Mother( bloodPressure.systolic >= 150, bloodPressure.diastolic >= 100)
+        not DetectedDisease( diseaseName == "Blood Pressure" , mother == $mother)
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Blood Pressure" , "Moderate", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getSeverity() + " " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+rule "Severe Blood Pressure"
+salience 10
+    when
+        $mother : Mother( bloodPressure.systolic >= 160, bloodPressure.diastolic >= 110)
+        not DetectedDisease( diseaseName == "Blood Pressure" , mother == $mother)
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Blood Pressure" , "Severe", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getSeverity() + " " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+
+
+// Detection of Blood Sugar Level (based on Fasting Blood Sugar Test) (mmol/L)
+rule "Gestational Diabetes"
+    when
+        $mother : Mother( isPregnant(), !historicalDisease.contains("Diabetes"), bloodSugar >= 5.1 )
+        not DetectedDisease( diseaseName == "Diabetes" , mother == $mother)
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Diabetes", "Gestational", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getSeverity() + " " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+rule "Having Diabetes Before Pregnant or postpartum Diabetes"
+    when
+        $mother : Mother ( bloodSugar >= 5.1 )
+        not DetectedDisease( diseaseName == "Diabetes", mother == $mother)
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Diabetes", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+
+
+// Detection of Anaemia (g/dL)
+rule "Iron Deficiency Anaemie for Trimester 1"
+    when
+        $mother : Mother( isPregnant(), trimester == 1, haemoglobinLevel <= 11 )
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Anaemia", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+rule "Iron Deficiency Anaemie for Trimester 2"
+    when
+        $mother : Mother( isPregnant(), trimester == 2, haemoglobinLevel <= 10.5 )
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Anaemia", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end
+
+rule "Iron Deficiency Anaemie for Trimester 3"
+    when
+        $mother : Mother( isPregnant(), trimester == 3, haemoglobinLevel <= 10 )
+    then
+        DetectedDisease detectedDisease  = new DetectedDisease( "Anaemia", $mother);
+        System.out.println($mother.getName() + " is detected " + detectedDisease.getDiseaseName());
+        insert(detectedDisease);
+end

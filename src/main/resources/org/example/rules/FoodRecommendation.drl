@@ -1,0 +1,101 @@
+package org.example.rules;
+
+import org.example.drools.entity.Mother
+import org.example.drools.entity.DetectedDisease
+import org.example.drools.entity.FoodRecommend
+
+// Diet Recommendation based on health Condition
+rule "High Blood Pressure Diet"
+    when
+        $mother : Mother()
+        DetectedDisease( diseaseName == "Blood Pressure" , mother == $mother )
+    then
+        insert(new FoodRecommend( "Sodium", "Reduce", $mother));
+end
+
+rule "Diabetes Diet"
+    when
+        $mother : Mother()
+        DetectedDisease( diseaseName == "Diabetes" , mother == $mother )
+    then
+        FoodRecommend foodRecommend = new FoodRecommend( "Low glycaemic index (GI) food", "Increase", $mother);
+        insert(foodRecommend);
+end
+
+rule "Iron Deficiency Anaemia Diet"
+    when
+        $mother : Mother()
+        DetectedDisease( diseaseName == "Anaemia" , mother == $mother )
+    then
+        insert(new FoodRecommend( "Iron", "Increase", $mother));
+        insert(new FoodRecommend( "Vitamin C", "Increase", $mother));
+end
+
+
+// Avoid Food Based on Allergy
+rule "Avoid Food for Allergy"
+    when
+        $mother : Mother( !allergyFood.isEmpty() )
+    then
+        for (String food : $mother.getAllergyFood()) {
+            insert(new FoodRecommend( food, "Avoid", $mother));
+        }
+end
+
+
+// Avoid Food Based on Religious
+rule "Islamic Diet"
+    when
+        $mother : Mother( dietReligious == "Islam" )
+    then
+        System.out.println($mother.getName() + " is having Islamic Diet");
+        insert(new FoodRecommend("Pork", "Avoid", $mother));
+end
+
+rule "Hindu Diet"
+    when
+        $mother : Mother( dietReligious == "Hindu" )
+    then
+        System.out.println($mother.getName() + " is having Hindu Diet");
+        insert(new FoodRecommend("Beef", "Avoid", $mother));
+end
+
+rule "Vegetarian"
+    when
+        $mother : Mother( dietReligious == "Vegetarian" )
+    then
+        System.out.println($mother.getName() + " is having Vegetarian Diet");
+        insert(new FoodRecommend("Meat", "Avoid", $mother));
+end
+
+
+// Diet Recommendation for postpartum based on Breastfeeding or not
+rule "Postpartum Woman who BreastFeeding Diet"
+    when
+        $mother : Mother( !isPregnant(), isBreastFeeding() )
+    then
+        System.out.println($mother.getName() + " is breastfeeding his child");
+        insert(new FoodRecommend("Iodine", "Increase", $mother));
+        insert(new FoodRecommend("Protein", "Increase", $mother));
+        insert(new FoodRecommend("Vitamin B12", "Increase", $mother));
+        insert(new FoodRecommend("Water", "Increase", $mother));
+        insert(new FoodRecommend("Caffeine", "Reduce", $mother));
+end
+
+
+// Diet Recommendation for Pregnancy Mother in 2 & 3 trimester
+rule "Second Trimester Pregnant Diet"
+    when
+        $mother : Mother( isPregnant(), trimester == 2)
+    then
+        insert(new FoodRecommend("Calori", "Increase", $mother));
+end
+
+rule "Third Trimester Pregnant Diet"
+    when
+        $mother : Mother( isPregnant(), trimester == 3)
+    then
+        insert(new FoodRecommend("Calori", "Increase", $mother));
+end
+
+// Still haven't set Food Recommendation For General Postpartum and Prenatal Woman

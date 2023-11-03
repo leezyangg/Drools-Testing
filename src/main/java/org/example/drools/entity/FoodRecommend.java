@@ -28,7 +28,6 @@ public class FoodRecommend {
         return "FoodRecommend[" +
                 "food='" + food + '\'' +
                 ", recommendationType='" + recommendationType + '\'' +
-                ", mother=" + mother.getName() +
                 ']';
     }
 

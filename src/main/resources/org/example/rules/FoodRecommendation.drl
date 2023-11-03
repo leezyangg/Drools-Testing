@@ -3,14 +3,56 @@ package org.example.rules;
 import org.example.drools.entity.Mother
 import org.example.drools.entity.DetectedDisease
 import org.example.drools.entity.FoodRecommend
+import org.example.drools.entity.NutritionRecommend
+
+// Base Recommendation For Mother (in mg)
+rule "Basic Nutrition Recomendation for Mother"
+    when
+        $mother : Mother()
+    then
+        insert(new NutritionRecommend("Calcium", 1000, $mother));
+        insert(new NutritionRecommend("Sodium", 2300, $mother));
+        insert(new NutritionRecommend("Iron", 27, $mother));
+end
+
+rule "Basic Nutrition Recomendation for Pregnant"
+    when
+        $mother : Mother( isPregnant() )
+    then
+        insert(new NutritionRecommend("Protein", 75000, $mother));
+        insert(new NutritionRecommend("Iodine", 0.22, $mother));
+        insert(new NutritionRecommend("Choline", 450, $mother));
+        insert(new NutritionRecommend("Vitamin A", 0.77, $mother));
+        insert(new NutritionRecommend("Vitamin C", 85, $mother));
+        insert(new NutritionRecommend("Vitamin D", 0.015, $mother));
+        insert(new NutritionRecommend("Vitamin B6", 1.9, $mother));
+        insert(new NutritionRecommend("Vitamin B12", 0.0026, $mother));
+        insert(new NutritionRecommend("Folic Acid", 0.6, $mother));
+end
+
+rule "Basic Nutrition Recomendation for Postpartum Women"
+    when
+        $mother : Mother( !isPregnant() )
+    then
+        insert(new NutritionRecommend("Protein", 46000, $mother));
+        insert(new NutritionRecommend("Iodine", 0.15, $mother));
+        insert(new NutritionRecommend("Choline", 425, $mother));
+//        insert(new NutritionRecommend("Vitamin A", 0.77, $mother));
+//        insert(new NutritionRecommend("Vitamin C", 85, $mother));
+        insert(new NutritionRecommend("Vitamin D", 0.005, $mother));
+//        insert(new NutritionRecommend("Vitamin B6", 1.9, $mother));
+        insert(new NutritionRecommend("Vitamin B12", 0.0024, $mother));
+        insert(new NutritionRecommend("Folic Acid", 0.4, $mother));
+end
 
 // Diet Recommendation based on health Condition
 rule "High Blood Pressure Diet"
     when
         $mother : Mother()
         DetectedDisease( diseaseName == "Blood Pressure" , mother == $mother )
+        $sodiumIntake : NutritionRecommend( nutrition == "Sodium", mother == $mother )
     then
-        insert(new FoodRecommend( "Sodium", "Reduce", $mother));
+        $sodiumIntake.setQuantity(1500); // Reduce sodium intake
 end
 
 rule "Diabetes Diet"
@@ -18,16 +60,16 @@ rule "Diabetes Diet"
         $mother : Mother()
         DetectedDisease( diseaseName == "Diabetes" , mother == $mother )
     then
-        FoodRecommend foodRecommend = new FoodRecommend( "Low glycaemic index (GI) food", "Increase", $mother);
-        insert(foodRecommend);
+        insert(new FoodRecommend("Low glycaemic index (GI) food", "Increase", $mother));
 end
 
 rule "Iron Deficiency Anaemia Diet"
     when
         $mother : Mother()
         DetectedDisease( diseaseName == "Anaemia" , mother == $mother )
+        $ironIntake : NutritionRecommend( nutrition == "Iron", mother == $mother )
     then
-        insert(new FoodRecommend( "Iron", "Increase", $mother));
+        $ironIntake.setQuantity(60);    // increase the iron intake
         insert(new FoodRecommend( "Vitamin C", "Increase", $mother));
 end
 
@@ -73,11 +115,20 @@ end
 rule "Postpartum Woman who BreastFeeding Diet"
     when
         $mother : Mother( !isPregnant(), isBreastFeeding() )
+        $proteinIntake : NutritionRecommend( nutrition == "Protein", mother == $mother )
+        $cholineIntake : NutritionRecommend( nutrition == "Choline", mother == $mother )
+        $folicAcidIntake : NutritionRecommend( nutrition == "Folic Acid", mother == $mother )
+        $iodineIntake : NutritionRecommend( nutrition == "Iodine", mother == $mother )
+        $vitaminB12Intake : NutritionRecommend( nutrition == "Vitamin B12", mother == $mother )
     then
         System.out.println($mother.getName() + " is breastfeeding his child");
-        insert(new FoodRecommend("Iodine", "Increase", $mother));
-        insert(new FoodRecommend("Protein", "Increase", $mother));
-        insert(new FoodRecommend("Vitamin B12", "Increase", $mother));
+
+        $proteinIntake.setQuantity(67000); // Increase Protein intake
+        $cholineIntake.setQuantity(550); // Increase Choline intake
+        $folicAcidIntake.setQuantity(0.5); // Increase Folic Acid intake
+        $iodineIntake.setQuantity(0.27); // Increase Iodine intake
+        $vitaminB12Intake.setQuantity(0.0028); // Increase Vitamin B12 intake
+
         insert(new FoodRecommend("Water", "Increase", $mother));
         insert(new FoodRecommend("Caffeine", "Reduce", $mother));
 end
@@ -97,5 +148,3 @@ rule "Third Trimester Pregnant Diet"
     then
         insert(new FoodRecommend("Calori", "Increase", $mother));
 end
-
-// Still haven't set Food Recommendation For General Postpartum and Prenatal Woman

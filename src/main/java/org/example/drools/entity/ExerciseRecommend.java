@@ -28,7 +28,6 @@ public class ExerciseRecommend {
         return "ExerciseRecommend[" +
                 "exercise='" + exercise + '\'' +
                 ", recommendationType='" + recommendationType + '\'' +
-                ", mother=" + mother.getName() +
                 ']';
     }
 }

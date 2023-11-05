@@ -44,8 +44,8 @@ public class MotherRecommendation {
 
         System.out.println();
 
-        System.out.println("==== Exercise Recommendation For Mother === ");
-        Collection<?> exerciseRecommendation = kieSession.getObjects(o-> o.getClass() == ExerciseRecommend.class);
-        exerciseRecommendation.forEach(System.out::println);
+//        System.out.println("==== Exercise Recommendation For Mother === ");
+//        Collection<?> exerciseRecommendation = kieSession.getObjects(o-> o.getClass() == ExerciseRecommend.class);
+//        exerciseRecommendation.forEach(System.out::println);
     }
 }

@@ -6,6 +6,7 @@ import org.example.drools.entity.ExerciseRecommend
 
 // Exercise Recommendation based on Health Condition
 rule "Severe Blood Pressure Exercise"
+salience -1
     when
         $mother : Mother()
         DetectedDisease( diseaseName == "Blood Pressure" , severity == "Severe", mother == $mother)
@@ -21,7 +22,7 @@ rule "High Blood Pressure Exercise"
         insert(new ExerciseRecommend("High Intensity Activity", "Avoid", $mother));
 end
 
-rule "Severe Anaemie Exercise"
+rule "Anaemie Exercise"
     when
         $mother : Mother()
         DetectedDisease( diseaseName == "Anaemie", mother == $mother)
